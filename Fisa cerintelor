@@ -1,0 +1,111 @@
+1.	Descriere
+Clientul doreste o aplicatie care sa sa transforme o schita arhitecturala intr-o reprezentare digitala de tip graf. Aplicatia este formata din trei module: transformarea unor imagini in date geometrice, interpretarea datelor(identificarea camerelor, holurilor etc.), respectiv preluarea datelor de la model si construirea unui graf pe baza acestora. 
+	Modulul 2 al aplicatiei va interpreta datele primite de la primul modul si va trimite o structura de date modulului 3, reprezentand fiecare componenta a schitei. Clientul temporar, modul 3, va putea astfel construi un graf pe baza acestor informatii, care va fi retinut in memorie in vederea utilizarii viitoare.
+
+2.	Domenii
+Clientul incarca o imagine constituind schita unui etaj al unei cladiri si va primi o reprezentare digitala de tip graf a imaginii, retinuta in memorie. 
+	In ceea ce priveste modulul doi, punctele de interes reprezinta: preluarea datelor geometrice primite de la primul modul, identificarea componentelor etajului , respectiv trimiterea datelor intr-un format avantajos modulului ultim, in vederea contstruirii modelului.
+
+
+3.Actionari/Interese
+	Firma: Pune la dispozitie utilizatorului o aplicatie care proceseaza o poza,    transformand-o intr-o reprezentare digitala, tip graf.
+	Clientul: Pune la dispozitie aplicatiei una sau mai multe fotografii reprezentand schitele unor etaje de cladiri, primind de la aplicatie reprezentarea in format electronic, specifica. Aceasta reprezentarea poate fi utilizata ulterior in alte aplicatii (exemple: reprezentari 3D, jocuri etc.).
+	Modului 2: aranjeaza informatiile de la primul modul in format avantajos pentru modulul final.
+	Doar utilizatorul este o persoana.
+
+4.Actori & Obiecte
+	Firma: satisfactia clientului
+	Clientul: sa dispuna de informatii rapid accesibile, legate de cladirea in cauza
+	Modulul 2: sa ofere o structura de date usor interpretabila modulului 3 si, implicit, sa ofere  functionabilitate proiectului (#promovarea materiei ^^)
+
+5.Scenarii de utilizare
+
+In urmatoarele cazuri vom descrie doar functionabilitatea modulului curent.
+
+5.1 Primim un flux de date
+	
+5.2 Identificarea unei camere
+5.3 Identificarea holurilor
+5.4 Interconectarea componentelor
+5.5 Conexiunea intre etaje
+5.6 Creearea structurii de date
+5.7 Trimiterea structurii de date
+5.8* Reprezentarea grafica a modelului (Optional)
+
+5.1 Primirea unui flux de date
+	5.1.1. Obiectiv/Context
+		Stocarea inputului in structuri de date pentru utilizarea ulterioara. 
+	5.1.2. Scenariu/Pasi
+		1. Informatiile primite sunt citite si procesate
+2. Fiecare  coordonata pentru fiecare componenta este retinuta intr-o structura de date usor calculabila ulterior. 
+	5.1.3 Extensii
+		1. Daca datele nu au fost transmise complet acest lucru este verificat si se asteapta toate datele pentru a incepe verificarea.
+		2. Datele sunt invalide din cauza unui factor extern si se va transmite un semnal primului modul pentru a transmite din nou datele.
+
+5.2 Identificarea camerelor
+	5.2.1 Obiective/Context
+		Avand toate segmentele primite se incepe verificarea pentru identificarea camerelor.
+	Verificarea se face utilizand structurile de date primite anterior.
+	5.2.2 Scenariu/Pasi
+		1. Pentru fiecare se cauta peretii adiacenti cu el
+		2. Se cauta in continuare peretii adiacenti pana la intalnirea cu un perete  deja „vizitat” sau pana se intalneste o usa.
+		3. La identificarea unui poligon care contine si o usa se va memora intr-o structura de date camera identificata
+	5.2.3 Extensii
+		1. Camera poate reprezenta un lift, daca acest lucru nu este identificat si transmis in prealabil de primul modul
+		2. Un spatiu inchis fara usi nu poate fi reprezentat ca o camera si va fi pus intr-o lista speciala.
+		3. Un hol poate fi interpretat ca o camera daca nu are reprezentate scari.
+
+5.3 Identificarea unui hol
+	5.3.1 Obiective/Context
+		Se va interpreta fiecare perete si se va determina daca este hol sau nu
+	5.3.2. Scenariu/Pasi
+		1. Se cauta peretii adiacenti astfel incat sa se poata identifica o camera.
+		2. Daca acea camera are legatura cu scarile atunci  este considerat hol. 
+	5.3.3. Extensii
+		1. Daca exista o camera fara scari sau lift, cu cel putin doua usi nu se poate deduce daca este hol sau nu.
+		2. Daca nu exista scari atunci nu se poate identifica holul si se incearca din nou recalcularea
+	
+5.4 Interconectarea componentelor
+	5.4.1 Obiective/Context
+		In urma identificarii componentelor se va determina pozitia ficarei incaperi in planul etajului.
+	5.4.2 Scenariu/Pasi
+		1. Presupunem ca datele sunt transmise in procente. Vom considera o axa cu o dimensiune usor calculabila(ex: 1000) 
+		2. Utilizand segmentele primite si incaperile identificate se poate determina pozitia fiecarei componente(unde incepe si unde se termina) si legaturile cu celelalte componente.
+	5.4.3 Extensii
+		1. Exista incaperi izolate, nu pot fi conectate sau nu se poate determina pozitia in cadrul planului etajui, iar datele sunt recalculate.
+
+5.5 Conexiunea intre etaje
+	5.5.1 Obiectiv/Context
+		Se va determina conexiunea intre etaje luand in considerare pozitia scarilor.
+	5.5.2 Scenariu/Pasi
+		1. Calculam pozitia scarilor pentru fiecare etaj.
+		2. Se incearca suprapunerea scarilor, iar cand exista o potrivire se stabileste conexiunea intre etaje.
+		3. Conexiunea va fi retinuta intr-o structura de date.
+	5.5.3 Extensii
+		1. Nu exista nicio scara care sa se potriveasca, iar atunci este primul sau ultimul etaj
+		2. Un etaj nu are scari si nu poate fi conectat de alt etaj.
+		3. Daca nu exista usa spre exterior la niciun etaj nu se poate dermina primul etaj
+	 
+5.6 Crearea unei structuri de date
+	5.6.1 Obiective/Context
+		Organizarea informatiilor intr-un format avantajos pentru prelucrea ulterioara modelului.
+	5.6.2 Scenariu/Pasi
+		1. Se preia schita interconectata
+		2. Schita este transpusa in structura ceruta de ultimul modul
+	5.6.3 Extensii
+		1. Datele interpretate nu sunt valide si se transmite un semnal corespunzator pentru transimterea structurii de date.
+5.7 Trimiterea structurii de date
+	5.7.1 Obiective/Context
+		Trimiterea datelor printr-un canal de comunicare modului 3
+	5.7.2 Scenariu/Pasi
+		1. Se pregateste structura de date pentru trimitere
+		2. Se stabiliste o conexiune intre cele doua modele.
+		3. Se transmit datele la modulul urmator.
+	5.7.3 Extensii
+		1. Datele sunt invalide, iar in acest caz nu se poate trimite nimic modulului urmator, caz in care se va transmite un semnal corespunzator.
+		  
+
+
+
+
+
